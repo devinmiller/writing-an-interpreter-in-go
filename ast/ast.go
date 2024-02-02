@@ -141,6 +141,24 @@ func (pe *PrefixExpression) String() string {
 	return out.String()
 }
 
+type PostfixExpression struct {
+	Token    token.Token // the postfix token, e.g. ++
+	Operator string
+}
+
+func (pe *PostfixExpression) expressionNode()      {}
+func (pe *PostfixExpression) TokenLiteral() string { return pe.Token.Literal }
+func (pe *PostfixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(pe.Token.Literal)
+	out.WriteString(pe.Operator)
+	out.WriteString(")")
+
+	return out.String()
+}
+
 type InfixExpression struct {
 	Token    token.Token // the operator token, e.g. +
 	Left     Expression

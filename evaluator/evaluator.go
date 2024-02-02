@@ -61,6 +61,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return evalInfixExpression(node.Operator, left, right)
 
+	case *ast.PostfixExpression:
+		return evalPostfixExpression(node.Operator, node, env)
+
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression, env)
 
@@ -174,6 +177,31 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+	}
+}
+
+func evalPostfixExpression(operator string, node *ast.PostfixExpression, env *object.Environment) object.Object {
+	ident, ok := env.Get(node.Token.Literal)
+	if !ok {
+		return newError("unknown identifier: %s", ident)
+	}
+
+	val, ok := ident.(*object.Integer)
+	if !ok {
+		return newError("unknown operator: %s %s", node.Token.Literal, operator)
+	}
+
+	v := val.Value
+
+	switch operator {
+	case "++":
+		env.Set(node.Token.Literal, &object.Integer{Value: v + 1})
+		return val
+	case "--":
+		env.Set(node.Token.Literal, &object.Integer{Value: v - 1})
+		return val
+	default:
+		return newError("unknown operator: %s %s", node.Token.Literal, operator)
 	}
 }
 
