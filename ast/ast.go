@@ -279,3 +279,42 @@ func (ce *CallExpression) String() string {
 
 	return out.String()
 }
+
+type ForExpression struct {
+	Token       token.Token // the 'for' token
+	Condition   Expression
+	Consequence *BlockStatement
+}
+
+func (fe *ForExpression) expressionNode()      {}
+func (fe *ForExpression) TokenLiteral() string { return fe.Token.Literal }
+func (fe *ForExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("for (")
+	out.WriteString(fe.Condition.String())
+	out.WriteString(") {")
+	out.WriteString(fe.Consequence.String())
+	out.WriteString("}")
+
+	return out.String()
+}
+
+type AssignExpression struct {
+	Token    token.Token
+	Name     *Identifier
+	Operator string
+	Value    Expression
+}
+
+func (ae *AssignExpression) expressionNode()      {}
+func (ae *AssignExpression) TokenLiteral() string { return ae.Token.Literal }
+func (ae *AssignExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ae.Name.String())
+	out.WriteString(ae.Operator)
+	out.WriteString(ae.Value.String())
+
+	return out.String()
+}

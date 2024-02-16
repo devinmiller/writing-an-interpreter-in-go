@@ -258,6 +258,40 @@ func TestParsingPostfixExpressions(t *testing.T) {
 	}
 }
 
+func TestParsingAssignExpressions(t *testing.T) {
+	infixTests := []struct {
+		input    string
+		name     string
+		operator string
+		value    interface{}
+	}{
+		{"y = true", "y", "=", true},
+		{"y = false", "y", "=", false},
+		{"x = 5", "x", "=", 5},
+	}
+
+	for _, tt := range infixTests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain %d statements. got=%d\n", 1, len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T", program.Statements[0])
+		}
+
+		if !testAssignExpression(t, stmt.Expression, tt.name,
+			tt.operator, tt.value) {
+			return
+		}
+	}
+}
+
 func TestOperatorPrecedenceParsing(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -362,6 +396,10 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{
 			"add(a + b + c * d / f + g)",
 			"add((((a + b) + ((c * d) / f)) + g))",
+		},
+		{
+			"a++ + b++",
+			"((a++) + (b++))",
 		},
 	}
 
@@ -693,6 +731,29 @@ func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, ope
 	}
 
 	if !testLiteralExpression(t, opExp.Right, right) {
+		return false
+	}
+
+	return true
+}
+
+func testAssignExpression(t *testing.T, exp ast.Expression, name string, operator string, value interface{}) bool {
+	opExp, ok := exp.(*ast.AssignExpression)
+	if !ok {
+		t.Errorf("exp is not ast.AssignExpression. got=%T(%s)", exp, exp)
+		return false
+	}
+
+	if !testIdentifier(t, opExp.Name, name) {
+		return false
+	}
+
+	if opExp.Operator != operator {
+		t.Errorf("exp.Operator is not '%s'. got=%q", operator, opExp.Operator)
+		return false
+	}
+
+	if !testLiteralExpression(t, opExp.Value, value) {
 		return false
 	}
 

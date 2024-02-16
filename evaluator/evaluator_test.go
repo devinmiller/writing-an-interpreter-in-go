@@ -28,8 +28,8 @@ func TestEvalIntegerExpression(t *testing.T) {
 		{"3 * 3 * 3 + 10", 37},
 		{"3 * (3 * 3) + 10", 37},
 		{"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50},
-		{"let five = 5; five++; five", 6},
-		{"let five = 5; five--; five", 4},
+		{"let five = 5; five++", 6},
+		{"let five = 5; five--", 4},
 	}
 
 	for _, tt := range tests {
@@ -102,6 +102,7 @@ func TestIfElseExpressions(t *testing.T) {
 		{"if (1 > 2) { 10 } else { 20 }", 20},
 		{"if (1 < 2) { 10 } else { 20 }", 10},
 		{"let one = 1; if (1 < one++) { 10 } else { 20 }", 10},
+		{"let one = 1; if (1 < one--) { 10 } else { 20 }", 20},
 	}
 
 	for _, tt := range tests {

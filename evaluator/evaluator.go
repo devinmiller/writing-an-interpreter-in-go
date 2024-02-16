@@ -31,6 +31,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		env.Set(node.Name.Value, val)
 
+	case *ast.AssignExpression:
+		return evalAssignStatement(ctx, node, env)
+
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 
@@ -195,11 +198,9 @@ func evalPostfixExpression(operator string, node *ast.PostfixExpression, env *ob
 
 	switch operator {
 	case "++":
-		env.Set(node.Token.Literal, &object.Integer{Value: v + 1})
-		return val
+		return env.Set(node.Token.Literal, &object.Integer{Value: v + 1})
 	case "--":
-		env.Set(node.Token.Literal, &object.Integer{Value: v - 1})
-		return val
+		return env.Set(node.Token.Literal, &object.Integer{Value: v - 1})
 	default:
 		return newError("unknown operator: %s %s", node.Token.Literal, operator)
 	}
