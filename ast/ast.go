@@ -281,9 +281,11 @@ func (ce *CallExpression) String() string {
 }
 
 type ForExpression struct {
-	Token       token.Token // the 'for' token
-	Condition   Expression
-	Consequence *BlockStatement
+	Token          token.Token // the 'for' token
+	Initialization *LetStatement
+	Condition      Expression
+	Iteration      Expression
+	Consequence    *BlockStatement
 }
 
 func (fe *ForExpression) expressionNode()      {}

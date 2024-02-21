@@ -32,7 +32,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		env.Set(node.Name.Value, val)
 
 	case *ast.AssignExpression:
-		return evalAssignStatement(ctx, node, env)
+		val := Eval(node.Value, env)
+		if isError(val) {
+			return val
+		}
+
+		evalAssignExpression(node.Name.Value, node.Operator, val, env)
 
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
@@ -116,6 +121,20 @@ func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	}
 
 	return result
+}
+
+func evalAssignExpression(name string, operator string, val object.Object, env *object.Environment) object.Object {
+	switch operator {
+	case "=":
+		_, ok := env.Get(name)
+		if !ok {
+			return newError("unknown variable: %s", name)
+		}
+
+		env.Set(name, val)
+	}
+
+	return val
 }
 
 func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {
