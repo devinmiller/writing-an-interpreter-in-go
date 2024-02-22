@@ -281,11 +281,11 @@ func (ce *CallExpression) String() string {
 }
 
 type ForExpression struct {
-	Token          token.Token // the 'for' token
-	Initialization *LetStatement
-	Condition      Expression
-	Iteration      Expression
-	Consequence    *BlockStatement
+	Token       token.Token // the 'for' token
+	Initializer *LetStatement
+	Condition   Expression
+	Iteration   Expression
+	Consequence *BlockStatement
 }
 
 func (fe *ForExpression) expressionNode()      {}
@@ -294,7 +294,12 @@ func (fe *ForExpression) String() string {
 	var out bytes.Buffer
 
 	out.WriteString("for (")
+	out.WriteString(fe.Initializer.String())
+	out.WriteString(";")
 	out.WriteString(fe.Condition.String())
+	out.WriteString(";")
+	out.WriteString(fe.Iteration.String())
+	out.WriteString(";")
 	out.WriteString(") {")
 	out.WriteString(fe.Consequence.String())
 	out.WriteString("}")
@@ -302,21 +307,21 @@ func (fe *ForExpression) String() string {
 	return out.String()
 }
 
-type AssignExpression struct {
+type AssignStatement struct {
 	Token    token.Token
 	Name     *Identifier
 	Operator string
 	Value    Expression
 }
 
-func (ae *AssignExpression) expressionNode()      {}
-func (ae *AssignExpression) TokenLiteral() string { return ae.Token.Literal }
-func (ae *AssignExpression) String() string {
+func (as *AssignStatement) expressionNode()      {}
+func (as *AssignStatement) TokenLiteral() string { return as.Token.Literal }
+func (as *AssignStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(ae.Name.String())
-	out.WriteString(ae.Operator)
-	out.WriteString(ae.Value.String())
+	out.WriteString(as.Name.String())
+	out.WriteString(as.Operator)
+	out.WriteString(as.Value.String())
 
 	return out.String()
 }

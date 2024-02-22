@@ -738,7 +738,7 @@ func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, ope
 }
 
 func testAssignExpression(t *testing.T, exp ast.Expression, name string, operator string, value interface{}) bool {
-	opExp, ok := exp.(*ast.AssignExpression)
+	opExp, ok := exp.(*ast.AssignStatement)
 	if !ok {
 		t.Errorf("exp is not ast.AssignExpression. got=%T(%s)", exp, exp)
 		return false

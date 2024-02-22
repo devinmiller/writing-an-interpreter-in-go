@@ -31,13 +31,13 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		env.Set(node.Name.Value, val)
 
-	case *ast.AssignExpression:
+	case *ast.AssignStatement:
 		val := Eval(node.Value, env)
 		if isError(val) {
 			return val
 		}
 
-		evalAssignExpression(node.Name.Value, node.Operator, val, env)
+		return evalAssignStatement(node, env)
 
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
@@ -123,15 +123,20 @@ func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	return result
 }
 
-func evalAssignExpression(name string, operator string, val object.Object, env *object.Environment) object.Object {
-	switch operator {
-	case "=":
-		_, ok := env.Get(name)
-		if !ok {
-			return newError("unknown variable: %s", name)
-		}
+func evalAssignStatement(node *ast.AssignStatement, env *object.Environment) object.Object {
+	val := Eval(node.Value, env)
+	if isError(val) {
+		return val
+	}
 
-		env.Set(name, val)
+	_, ok := env.Get(node.Name.Value)
+	if !ok {
+		return newError("unknown variable: %s", node.Name.Value)
+	}
+
+	switch node.Operator {
+	case "=":
+		env.Set(node.Name.Value, val)
 	}
 
 	return val

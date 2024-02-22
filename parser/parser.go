@@ -75,7 +75,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
-	p.registerInfix(token.ASSIGN, p.parseAssignExpression)
+	p.registerInfix(token.ASSIGN, p.parseAssignStatement)
 
 	p.postfixParseFn = map[token.TokenType]postfixParseFn{}
 	p.registerPostfix(token.PLUSPLUS, p.parsePostfixExpression)
@@ -410,8 +410,8 @@ func (p *Parser) parseForExpression() ast.Expression {
 	return expression
 }
 
-func (p *Parser) parseAssignExpression(name ast.Expression) ast.Expression {
-	stmt := &ast.AssignExpression{Token: p.curToken}
+func (p *Parser) parseAssignStatement(name ast.Expression) ast.Expression {
+	stmt := &ast.AssignStatement{Token: p.curToken}
 
 	if n, ok := name.(*ast.Identifier); ok {
 		stmt.Name = n
